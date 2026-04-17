@@ -1,23 +1,30 @@
 
 .PHONY: all clean
 
-all: diff.stamp
+OUT := out
+CC := gcc
+CFLAGS := -w
 
-hello.elf: hello.c
-	gcc -w -o $@ $<
+all: $(OUT)/diff.stamp
 
-gcc_hello.txt: hello.elf
-	./hello.elf > $@
+$(OUT):
+	mkdir -p $@
 
-c4.elf: c4.c
-	gcc -w -o $@ $<
+$(OUT)/hello.elf: hello.c | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $<
 
-c4_hello.txt: c4.elf hello.c
-	./c4.elf hello.c > $@
+$(OUT)/gcc_hello.txt: $(OUT)/hello.elf | $(OUT)
+	$< > $@
 
-diff.stamp: gcc_hello.txt c4_hello.txt
+$(OUT)/c4.elf: c4.c | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(OUT)/c4_hello.txt: $(OUT)/c4.elf hello.c | $(OUT)
+	$^ > $@
+
+$(OUT)/diff.stamp: $(OUT)/gcc_hello.txt $(OUT)/c4_hello.txt | $(OUT)
 	diff --color=auto -u $^
 	@touch $@
 
 clean:
-	rm -f hello.elf gcc_hello.txt c4.elf c4_hello.txt diff.stamp
+	rm -rf $(OUT)

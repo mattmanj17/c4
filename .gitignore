@@ -1,6 +1,2 @@
 
-hello.elf
-gcc_hello.txt
-c4.elf
-c4_hello.txt
-diff.stamp
+out/
