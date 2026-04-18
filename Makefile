@@ -1,12 +1,18 @@
 
+# lines starting with the character '#' are 'comments'.
+# they are just there to read.
+# they are treated as blank lines.
+
 # a simple 'makefile' is a list of 'targets'.
 #     a 'target' looks like:
 #         _name_ : _deps_
 #             _recipe_
 #     where:
-#         '_name_' is the name of the target.
-#         '_deps_' is a list of dependencies.
-#         '_recipe_' is a script used to make the target.
+#         - '_name_' is the name of the target.
+#         - '_deps_' is a list of dependencies.
+#         - '_recipe_' is a script used to make the target.
+#           NOTE that each line of the script must start
+#           with a literal tab ('\t') character.
 #
 # when 'make' is invoked with no arguments,
 # it opens this file and makes the first target.
