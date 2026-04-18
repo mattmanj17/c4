@@ -1,26 +1,26 @@
 
 .PHONY: all clean
 
-all: out/diff
+all: o/diff
 
-out:
-	mkdir -p out
+o:
+	mkdir -p o
 
-out/hw: hw.c | out
-	gcc -w -o out/hw hw.c
+o/hw: hw.c | o
+	gcc -w -o o/hw hw.c
 
-out/0: out/hw | out
-	out/hw > out/0
+o/0: o/hw | o
+	o/hw > o/0
 
-out/c4: c4.c | out
-	gcc -w -o out/c4 c4.c 
+o/c4: c4.c | o
+	gcc -w -o o/c4 c4.c 
 
-out/1: out/c4 hw.c | out
-	out/c4 hw.c > out/1
+o/1: o/c4 hw.c | o
+	o/c4 hw.c > o/1
 
-out/diff: out/0 out/1 | out
-	diff --color=auto -u out/0 out/1
-	touch out/diff
+o/diff: o/0 o/1 | o
+	diff --color=auto -u o/0 o/1
+	touch o/diff
 
 clean:
-	rm -rf out
+	rm -rf o
