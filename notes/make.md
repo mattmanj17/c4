@@ -42,5 +42,19 @@
 
 - you can do `make <target>` to make a specific target
 
+### order-only dependencies
 
+- sometimes, you want to make sure a target _T0_ is made  
+  _before_ target _T1_ is made,  
+  ___but___, you don't want the timestamp of _T0_  
+  to cause _T1_ to get re-made
+
+  - a common use case is targets that ensure directories exist
+
+- to do this, list _T0_ after a `|` in the deps of _T1_
+    ```
+    # for example
+    T1 : foo | T0
+        foo bar
+    ```
 

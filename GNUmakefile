@@ -57,24 +57,6 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
-# order-only dependencies
-#
-# sometimes, you want to make sure a dependency is made first,
-# but you do not want its timestamp alone to make the target out of date.
-#
-# to do that, you list it after a '|' character in the dependency list.
-#
-# for example, this target:
-#
-#    T : a b | c
-#        foo a b c > T
-#
-# has 'a' and 'b' as normal dependencies,
-# but 'c' as an order-only dependency
-#
-# so, make must make 'c' before making 'T', if needed,
-# but a newer timestamp on 'c' does not by itself force 'T' to rebuild.
-
 # automatic variables
 #
 # there are some special bits of syntax used to refer to target
