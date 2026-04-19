@@ -154,7 +154,7 @@
 #    - $< : The name of the first dependency.
 #
 #    - $+ : The names of all the dependencies, with spaces between them.
-#           (does include order-only dependencies)
+#           (does not include order-only dependencies)
 
 # 'output redirection' with '>'
 #
