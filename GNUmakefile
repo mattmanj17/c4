@@ -1,10 +1,6 @@
 
 # commands we depend on:
 #
-# - "mkdir -p <arg>"
-#    * create the directory <arg>
-#    * create missing parent directories as well
-#
 # - "gcc -w -o <out> <in>"
 #    * build the command <out> from the c file <in>
 #    * ignore warnings
@@ -31,12 +27,6 @@
 #    * read lines from standard input, one at a time
 #    * use the awk script <script> to decide what to do for each line
 #    * please document awk scripts inline
-#
-# - "rm -rf <arg>"
-#    * remove the file or directory <arg>
-#    * if <arg> is a directory, remove everything inside it recursively
-#    * do not prompt for confirmation
-#    * ignore nonexistent files and directories
 
 # default target
 # it has no recipe of its own
@@ -44,34 +34,16 @@
 #
 all: o/diff_hw.ok
 
-# output directory
-#
-# this makefile puts all generated files in 'o/'.
-# targets that write to this directory must run after we create it,
-# so they have an order-only dependency on it ("| o").
-#
-# run 'make clean' to remove 'o/'.
-#
+# create output directory
+# --parents : no error if existing, make parent directories as needed
 o:
-	mkdir -p o
+	mkdir --parents o
 
-# ".elf" files: custom commands built from .c files
-# ".elf" stands for "Executable and Linkable Format"
-#
-# our custom commands are:
-#
-#   - hw.elf
-#     * prints "hello, world"
-#
-#   - c4.elf <src> <args>
-#     * interprets the c file <src> as if it were a compiled command
-#     * passes <args> to the interpreted command
-#
-#   - c4.elf -s <src>
-#     * compiles <src> to bytecode, and prints it
-#
+# compile executables
+# --no-warnings : inhibit all warnings
+# --output=<file> : place output into <file>
 o/%.elf: %.c | o
-	gcc -w -o $@ $<
+	gcc --no-warnings --output=$@ $<
 
 # should all print 'hello world'
 o/hw0.txt: o/hw.elf | o
@@ -215,8 +187,10 @@ o/diff_c4_s_0_1.ok: o/trunc_diff.sh o/c4_s_0.txt o/c4_s_1.txt | o
 	touch $@
 
 # remove o/
+# --recursive : remove directories and their contents recursively
+# --force : ignore nonexistent files and arguments, never prompt
 clean:
-	rm -rf o
+	rm --recursive --force o
 
 # targets always considered out of date.
 # .PHONY has no recipe of its own.
