@@ -33,19 +33,6 @@
 #    * connect standard output of <lhs> to standard input of <rhs>
 #    * this lets <rhs> read the text produced by <lhs>
 #
-# - "<lhs> > <rhs>"
-#    * output redirection
-#    * run <lhs>
-#    * send its standard output to the file <rhs>
-#      instead of to the terminal
-#    * if <rhs> already exists, overwrite it
-#
-# - "<lhs> < <rhs>"
-#    * input redirection
-#    * run <lhs>
-#    * give it the contents of the file <rhs> as standard input
-#      instead of reading from the terminal
-#
 # - "awk <script>"
 #    * read lines from standard input, one at a time
 #    * use the awk script <script> to decide what to do for each line

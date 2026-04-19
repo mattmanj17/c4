@@ -74,3 +74,12 @@
     - variables are expanded 
         - `x=hello` `echo "$x"` prints `hello`
         
+### redirection operators
+
+- `command > file`
+    - redirect the output of `command` to the file `file`
+    - if `file` already exists, overwrite it
+    - `echo hello > hello.txt` creates `hello.txt` containing `"hello\n"`
+
+- `command < file`
+    - `command` reads from `file` instead of the terminal
