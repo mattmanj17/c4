@@ -144,6 +144,18 @@
 #
 # has 'a' and 'b' as normal deps, but 'c' as an 'order-only' dependency
 
+# 'automatic variables'
+#
+# there are some special bits of syntax used to reference target/dep
+# names indirectly. the ones we use are:
+#
+#    - $@ : The file name of the target of the rule.
+#
+#    - $< : The name of the first dependency.
+#
+#    - $+ : The names of all the dependencies, with spaces between them.
+#           (does include order-only dependencies)
+
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
@@ -178,17 +190,17 @@ o/%.elf: %.c | o
 
 # should all print 'hello world'
 o/hw0: o/hw.elf | o
-	$< > $@
+	$+ > $@
 o/hw1: o/c4.elf hw.c | o
-	$< hw.c > $@
+	$+ > $@
 o/hw2: o/c4.elf c4.c hw.c | o
-	$< c4.c hw.c > $@
-o/hw3: o/c4.elf c4.c hw.c | o
-	$< c4.c c4.c hw.c > $@
+	$+ > $@
+o/hw3: o/c4.elf c4.c c4.c hw.c | o
+	$+ > $@
 
 # check all hw outputs match
 o/diff_hw_0_%: o/hw0 o/hw% | o
-	diff --color=auto -u $^
+	diff --color=auto -u $+
 	touch $@
 o/diff_hw: \
 	o/diff_hw_0_1 \
