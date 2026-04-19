@@ -91,7 +91,7 @@
 #    * compile the c file <in> to the command <out>
 #    * ignore warnings
 #
-# - "diff --color=auto -u <lhs> <rhs>"
+# - "diff --color=always -u <lhs> <rhs>"
 #    * compare the files <lhs> and <rhs>
 #    * do nothing if they are equal
 #    * otherwise, fail and print a unified diff, with color
@@ -108,6 +108,17 @@
 #    * allows <arg> to be run directly
 #    * used for shell scripts, so you can just do
 #      "./foo.sh" instead of "sh ./foo.sh"
+#
+# - '<lhs> | <rhs>'
+#    * a 'pipe'
+#    * run <lhs> and <rhs>
+#    * connect standard output of <lhs> to standard input of <rhs>
+#    * this lets <rhs> read the text produced by <lhs>
+#
+# - 'awk <script>'
+#    * read lines from standard input, one at a time
+#    * for each input line, run the awk script <script>
+#    * please document scripts inline
 #
 # - "rm -rf <arg>"
 #    * remove the file or directory <arg>
@@ -201,7 +212,7 @@
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
 #
-all: o/diff_hw o/c4_s.sh
+all: o/diff_hw o/diff_c4_s_0_1
 
 # output directory
 #
@@ -242,14 +253,91 @@ o/hw2: o/c4.elf c4.c hw.c | o
 o/hw3: o/c4.elf c4.c c4.c hw.c | o
 	$+ > $@
 
+# helper script to truncate output to 30 lines
+#
+# - #!/bin/sh
+# - awk 'NR<=30{print "# " $0} NR==31{print "..."; exit}'
+#
+# '#!/bin/sh' marks it as a 'shell script'
+#
+# * NR:
+#     "Number of record", that is, line number
+#
+# * NR<=30:
+#     "for each of the first 30 lines ..."
+#
+# * NR<=30{print "# " $0}:
+#     "print leading lines (prefixed with "# "), up to 30"
+#
+# * NR==31:
+#     "if line 31 exists ..."
+#
+# * NR==31{print "..."; exit}:
+#     if line 31 exists, print "...",
+#     then exit the script
+#
+# so the whole awk script prints up to 30 leading lines of the input,
+# and prints "..." if there were more lines
+#
+# we wrap the script in '...' instead of "...",
+# to prevent expansion of '$0' by the shell before passing to awk.
+#
+# NOTE that we must escape '\'' inside '...',
+# so that the quoted text does not end early
+#
+# that is, to quote "a 'b' c" in single quotes, you write
+#    'a '\''b'\'' c'
+# the trick is that the 5 bits
+#    'a ', \', 'b', \', ' c',
+# get concatenated back together to "a 'b' c"
+#
+# ALSO NOTE that, we have to escape '$' here,
+# as it is a meta character in make.
+# that is, to put a '$' in a script line, we type '$$'
+#
+o/trunc_30.sh: | o
+	printf '%s\n' \
+		'#!/bin/sh' \
+		'awk '\''NR<=30{print "# " $$0} NR==31{print "..."; exit}'\''' \
+		> $@
+	chmod +x $@
+
+# helper script to invoke 'diff --color=always -u $1 $2',
+# truncating output
+#
+# - #!/bin/sh
+# - diff --color=always -u "$1" "$2" > tmp.txt
+# - rc=$?
+# - o/trunc_30.sh < tmp.txt
+# - rm tmp.txt
+# - exit "$rc"
+#
+# we capture the output of diff in a temporary file 'tmp.txt'
+#
+# we cache the return code of diff in a variable to return it
+# after passing tmp.txt to trunc_30.sh
+#
+# we clean up tmp.txt, then forward along the return code
+#
+o/trunc_diff.sh: o/trunc_30.sh | o
+	printf '%s\n' \
+		'#!/bin/sh' \
+		'diff --color=always -u "$$1" "$$2" > tmp.txt' \
+		'rc=$$?' \
+		'o/trunc_30.sh < tmp.txt' \
+		'rm tmp.txt' \
+		'exit "$$rc"' \
+		> $@
+	chmod +x $@
+
 # check all hw outputs match
 #
 # note that 'diff' does not output a file,
 # so we use 'touch $@' to produce a placeholder file,
 # just to keep track of the time stamp of the last successful run.
 #
-o/diff_hw_0_%: o/hw0 o/hw% | o
-	diff --color=auto -u $+
+o/diff_hw_0_%: o/trunc_diff.sh o/hw0 o/hw% | o
+	$+
 	touch $@
 o/diff_hw: \
 	o/diff_hw_0_1 \
@@ -257,22 +345,27 @@ o/diff_hw: \
 	o/diff_hw_0_3
 	touch $@
 
-# make little helper script to invoke 'c4.elf -s'
+# helper script to invoke 'c4.elf -s'
 #
 # - #!/bin/sh
 # - o/c4.elf -s "$1"
 #
-# '#!/bin/sh' marks it as a 'shell script'
 # 'o/c4.elf -s "$1"' invokes c4.elf -s, passing along the first script argument
 #
 # so, 'o/c4_s.sh hw.c' would do 'o/c4.elf -s "hw.c"'
 #
-# NOTE that, we have to escape '$' here, as it is a meta character in make.
-#  that is, to put a '$' in a script line, we type '$$'
-#
 o/c4_s.sh: o/c4.elf | o
 	printf '%s\n' '#!/bin/sh' 'o/c4.elf -s "$$1"' > $@
 	chmod +x $@
+
+# c4 -s should be deterministic
+o/c4_s_0: o/c4_s.sh c4.c | o
+	$+ > $@
+o/c4_s_1: o/c4_s.sh c4.c | o
+	$+ > $@
+o/diff_c4_s_0_1: o/trunc_diff.sh o/c4_s_0 o/c4_s_1 | o
+	$+
+	touch $@
 
 # remove o/
 clean:
