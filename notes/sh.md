@@ -83,3 +83,9 @@
 
 - `command < file`
     - `command` reads from `file` instead of the terminal
+
+### pipe operator
+
+- `command_1 | command_0`
+    - `command_1` reads the output of `command_0`,  
+    instead of from the terminal

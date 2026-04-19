@@ -27,12 +27,6 @@
 #    * used for shell scripts, so you can just do
 #      "./foo.sh" instead of "sh ./foo.sh"
 #
-# - "<lhs> | <rhs>"
-#    * a pipe
-#    * run <lhs> and <rhs> as a pipeline
-#    * connect standard output of <lhs> to standard input of <rhs>
-#    * this lets <rhs> read the text produced by <lhs>
-#
 # - "awk <script>"
 #    * read lines from standard input, one at a time
 #    * use the awk script <script> to decide what to do for each line
