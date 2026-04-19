@@ -38,31 +38,6 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
-# line continuations
-#
-# sometimes, a target definition or recipe line would be too long
-# to write comfortably on one physical line.
-#
-# in that case, you can end a line with '\' to continue it
-# onto the next line.
-#
-# the '\' and the following line break are treated as if they were not there.
-# so, this lets one logical line be written across multiple physical lines.
-#
-# IMPORTANT:
-# the '\' must be the last character on the line.
-# trailing whitespace after '\' can break this.
-#
-# for example:
-#
-#    T : a \
-#        b \
-#        c
-#
-# is treated the same as:
-#
-#    T : a b c
-
 # default target
 # it has no recipe of its own
 # it just lists the targets to make by default
