@@ -298,16 +298,16 @@
 #
 #    T : a b c
 
-# default target.
-# it has no recipe of its own.
-# it just lists the targets to make 'by default'.
+# default target
+# it has no recipe of its own
+# it just lists the targets to make by default
 #
-all: o/diff_hw o/diff_c4_s_0_1
+all: o/diff_hw.ok o/diff_c4_s_0_1.ok
 
 # output directory
 #
 # this makefile puts all generated files in 'o/'.
-# targets that write to this directory need to run _after_ we create it,
+# targets that write to this directory must run after we create it,
 # so they have an order-only dependency on it ("| o").
 #
 # run 'make clean' to remove 'o/'.
@@ -334,13 +334,13 @@ o/%.elf: %.c | o
 	gcc -w -o $@ $<
 
 # should all print 'hello world'
-o/hw0: o/hw.elf | o
+o/hw0.txt: o/hw.elf | o
 	$+ > $@
-o/hw1: o/c4.elf hw.c | o
+o/hw1.txt: o/c4.elf hw.c | o
 	$+ > $@
-o/hw2: o/c4.elf c4.c hw.c | o
+o/hw2.txt: o/c4.elf c4.c hw.c | o
 	$+ > $@
-o/hw3: o/c4.elf c4.c c4.c hw.c | o
+o/hw3.txt: o/c4.elf c4.c c4.c hw.c | o
 	$+ > $@
 
 # helper script to truncate output to 30 lines
@@ -348,42 +348,52 @@ o/hw3: o/c4.elf c4.c c4.c hw.c | o
 # - #!/bin/sh
 # - awk 'NR<=30{print "# " $0} NR==31{print "..."; exit}'
 #
-# '#!/bin/sh' marks it as a 'shell script'
+# #!/bin/sh marks it as a shell script.
+#
+# in awk:
 #
 # * NR:
-#     "Number of record", that is, line number
+#     "number of record", that is, the current input line number
 #
 # * NR<=30:
 #     "for each of the first 30 lines ..."
 #
 # * NR<=30{print "# " $0}:
-#     "print leading lines (prefixed with "# "), up to 30"
+#     print the first 30 lines, each prefixed with "# "
+#     here, '$0' means "the whole current input line"
 #
 # * NR==31:
 #     "if line 31 exists ..."
 #
 # * NR==31{print "..."; exit}:
 #     if line 31 exists, print "...",
-#     then exit the script
+#     then stop immediately
 #
-# so the whole awk script prints up to 30 leading lines of the input,
-# and prints "..." if there were more lines
+# so the whole awk script prints up to the first 30 lines of the input,
+# and prints "..." if there were more.
 #
 # we wrap the script in '...' instead of "...",
-# to prevent expansion of '$0' by the shell before passing to awk.
+# so that the shell passes '$0' to awk literally,
+# rather than expanding it first.
 #
-# NOTE that we must escape '\'' inside '...',
-# so that the quoted text does not end early
+# to put a literal single quote inside text that is otherwise
+# single-quoted for the shell, we have to break out of the quotes,
+# insert the single quote, then start single-quoting again.
 #
-# that is, to quote "a 'b' c" in single quotes, you write
+# that is, to quote:
+#    a 'b' c
+# we write:
 #    'a '\''b'\'' c'
-# the trick is that the 5 bits
-#    'a ', \', 'b', \', ' c',
-# get concatenated back together to "a 'b' c"
 #
-# ALSO NOTE that, we have to escape '$' here,
-# as it is a meta character in make.
-# that is, to put a '$' in a script line, we type '$$'
+# the five pieces:
+#    'a ', \', 'b', \', ' c'
+# are concatenated by the shell back into:
+#    a 'b' c
+#
+# NOTE:
+# in a make recipe, '$' is already a special character.
+# so, to put a literal '$' in the generated script,
+# we write '$$' in the makefile.
 #
 o/trunc_30.sh: | o
 	printf '%s\n' \
@@ -393,46 +403,50 @@ o/trunc_30.sh: | o
 	chmod +x $@
 
 # helper script to invoke 'diff --color=always -u $1 $2',
-# truncating output
+# truncating its output
 #
 # - #!/bin/sh
-# - diff --color=always -u "$1" "$2" > tmp.txt
+# - tmp=$(mktemp)
+# - diff --color=always -u "$1" "$2" > "$tmp"
 # - rc=$?
-# - o/trunc_30.sh < tmp.txt
-# - rm tmp.txt
+# - o/trunc_30.sh < "$tmp"
+# - rm -f "$tmp"
 # - exit "$rc"
 #
-# we capture the output of diff in a temporary file 'tmp.txt'
+# we capture the output of diff in a temporary file.
 #
-# we cache the return code of diff in a variable to return it
-# after passing tmp.txt to trunc_30.sh
+# we cache the return code of diff in a variable,
+# so that we can return it after passing its output
+# through o/trunc_30.sh.
 #
-# we clean up tmp.txt, then forward along the return code
+# we then remove the temporary file,
+# and forward along the original return code.
 #
 o/trunc_diff.sh: o/trunc_30.sh | o
 	printf '%s\n' \
 		'#!/bin/sh' \
-		'diff --color=always -u "$$1" "$$2" > tmp.txt' \
+		'tmp=$$(mktemp)' \
+		'diff --color=always -u "$$1" "$$2" > "$$tmp"' \
 		'rc=$$?' \
-		'o/trunc_30.sh < tmp.txt' \
-		'rm tmp.txt' \
+		'o/trunc_30.sh < "$$tmp"' \
+		'rm -f "$$tmp"' \
 		'exit "$$rc"' \
 		> $@
 	chmod +x $@
 
-# check all hw outputs match
+# check that all hw outputs match
 #
-# note that 'diff' does not output a file,
-# so we use 'touch $@' to produce a placeholder file,
-# just to keep track of the time stamp of the last successful run.
+# note that 'diff' does not produce an output file.
+# so, we use 'touch $@' to create a placeholder file,
+# whose timestamp records the last successful run.
 #
-o/diff_hw_0_%: o/trunc_diff.sh o/hw0 o/hw% | o
+o/diff_hw_0_%.ok: o/trunc_diff.sh o/hw0.txt o/hw%.txt | o
 	$+
 	touch $@
-o/diff_hw: \
-	o/diff_hw_0_1 \
-	o/diff_hw_0_2 \
-	o/diff_hw_0_3
+o/diff_hw.ok: \
+	o/diff_hw_0_1.ok \
+	o/diff_hw_0_2.ok \
+	o/diff_hw_0_3.ok
 	touch $@
 
 # helper script to invoke 'c4.elf -s'
@@ -440,20 +454,22 @@ o/diff_hw: \
 # - #!/bin/sh
 # - o/c4.elf -s "$1"
 #
-# 'o/c4.elf -s "$1"' invokes c4.elf -s, passing along the first script argument
+# 'o/c4.elf -s "$1"' invokes c4.elf -s,
+# passing along the first script argument.
 #
-# so, 'o/c4_s.sh hw.c' would do 'o/c4.elf -s "hw.c"'
+# so, 'o/c4_s.sh hw.c' does:
+#     o/c4.elf -s "hw.c"
 #
 o/c4_s.sh: o/c4.elf | o
 	printf '%s\n' '#!/bin/sh' 'o/c4.elf -s "$$1"' > $@
 	chmod +x $@
 
 # c4 -s should be deterministic
-o/c4_s_0: o/c4_s.sh c4.c | o
+o/c4_s_0.txt: o/c4_s.sh c4.c | o
 	$+ > $@
-o/c4_s_1: o/c4_s.sh c4.c | o
+o/c4_s_1.txt: o/c4_s.sh c4.c | o
 	$+ > $@
-o/diff_c4_s_0_1: o/trunc_diff.sh o/c4_s_0 o/c4_s_1 | o
+o/diff_c4_s_0_1.ok: o/trunc_diff.sh o/c4_s_0.txt o/c4_s_1.txt | o
 	$+
 	touch $@
 
