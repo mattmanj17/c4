@@ -156,6 +156,18 @@
 #    - $+ : The names of all the dependencies, with spaces between them.
 #           (does include order-only dependencies)
 
+# 'output redirection' with '>'
+#
+# if you have a command that prints something,
+# but you want to have that output to a file instead of just
+# writing to the terminal, you can use '>' to redirect the output to a file
+#
+# that is:
+#
+#    if "cat a b" printed "a\nb\b" to the terminal,
+#    you could instead do "cat a b > c" to save that
+#    output to a file named 'c', instead.
+
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
