@@ -101,7 +101,15 @@
 #    * if F does not exist, create it as an empty file
 #    * set F's last-modified time to now
 #
-# - 'rm -rf <arg>'
+# - "printf '%s\n' <args...>"
+#    * print each argument followed by a line break
+#
+# - "chmod +x <arg>"
+#    * allows <arg> to be run directly
+#    * used for shell scripts, so you can just do
+#      "./foo.sh" instead of "sh ./foo.sh"
+#
+# - "rm -rf <arg>"
 #    * remove the file or directory <arg>
 #    * if <arg> is a directory, remove everything inside it recursively
 #    * do not prompt for confirmation
@@ -193,7 +201,7 @@
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
 #
-all: o/diff_hw
+all: o/diff_hw o/c4_s.sh
 
 # output directory
 #
@@ -217,6 +225,9 @@ o:
 #   - c4.elf <src> <args>
 #     * interprets the c file <src> as if it were a compiled command
 #     * passes <args> to the interpreted command
+#
+#   - c4.elf -s <src>
+#     * compiles <src> to bytecode, and prints it
 #
 o/%.elf: %.c | o
 	gcc -w -o $@ $<
@@ -245,6 +256,23 @@ o/diff_hw: \
 	o/diff_hw_0_2 \
 	o/diff_hw_0_3
 	touch $@
+
+# make little helper script to invoke 'c4.elf -s'
+#
+# - #!/bin/sh
+# - o/c4.elf -s "$1"
+#
+# '#!/bin/sh' marks it as a 'shell script'
+# 'o/c4.elf -s "$1"' invokes c4.elf -s, passing along the first script argument
+#
+# so, 'o/c4_s.sh hw.c' would do 'o/c4.elf -s "hw.c"'
+#
+# NOTE that, we have to escape '$' here, as it is a meta character in make.
+#  that is, to put a '$' in a script line, we type '$$'
+#
+o/c4_s.sh: o/c4.elf | o
+	printf '%s\n' '#!/bin/sh' 'o/c4.elf -s "$$1"' > $@
+	chmod +x $@
 
 # remove o/
 clean:
