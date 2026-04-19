@@ -135,11 +135,17 @@
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
+#
 all: o/diff_hw
 
 # output directory
+#
 # this makefile puts all generated files in 'o/'.
-# run 'make clean' to remove it.
+# targets that right to this directory need to run
+# after we create it, so that have an order-only dependency on it ("| o").
+#
+# run 'make clean' to remove 'o/'.
+#
 o:
 	mkdir -p o
 
