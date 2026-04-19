@@ -107,6 +107,31 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
+# wildcards
+#
+# in the name/deps of a target, the character '%' has a special meaning.
+# essentialy, you are allowed to have at most one % in the target name,
+# and if you do, the names of dependencies may have % in them as well.
+#
+# the % in the target name matches arbitrary text, and that text is pasted
+# into the dep names.
+#
+# for example, if you had a target
+#
+#    T_% : D_%
+#        foo D_% > T_%
+#
+# any time you reference a target of the form 'T_*',
+# it is as if you had a target named that, with % replaced with *.
+#
+# that is, if you referenced T_0 and T_1, it would be as if you had the rules
+#
+#    T_0 : D_0
+#        foo D_0 > T_0
+#
+#    T_1 : D_1
+#        foo D_1 > T_1
+
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
