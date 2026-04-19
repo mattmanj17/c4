@@ -57,19 +57,6 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
-# automatic variables
-#
-# there are some special bits of syntax used to refer to target
-# and dependency names indirectly. the ones used here are:
-#
-#    - $@ : the file name of the target of the rule
-#
-#    - $< : the file name of the first dependency
-#
-#    - $+ : the file names of all the dependencies,
-#           separated by spaces, preserving duplicates
-#           order-only dependencies are not included
-
 # pattern rules
 #
 # in a target or dependency name,

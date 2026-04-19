@@ -58,3 +58,13 @@
         foo bar
     ```
 
+### automatic variables
+
+- `$@` name of current target
+
+- `$<` first dependency
+
+- `$+` all dependencies
+    - separated by spaces
+    - preserves duplicates
+    - order-only dependencies not included
