@@ -168,6 +168,27 @@
 #    you could instead do "cat a b > c" to save that
 #    output to a file named 'c', instead.
 
+# line continuations
+#
+# the 'name : deps' part of a target definition (and each script line),
+# must all be on one line (that is, contain no line breaks).
+# this is a bit of a pain when you would end up with a very long line,
+# so, there a feature where you can put a '\' at the end of a line to
+# 'ignore' the line break. '\' must be the very last character on the line
+# (no trailing whitespace).
+#
+# for example:
+#
+#    T : a\
+#        b\
+#        c
+#        d
+#
+# ends up the same as
+#
+#    T : a b c
+#        d
+
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
