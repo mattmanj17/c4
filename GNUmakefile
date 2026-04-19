@@ -132,6 +132,18 @@
 #    T_1 : D_1
 #        foo D_1 > T_1
 
+# order-only dependencies
+#
+# when you want to depend on merely the existence of a file, and not
+# its time stamp, you list it after a '|' character in the dependencies
+#
+# that is, this target
+#
+#    T : a b | c
+#        foo a b c > T
+#
+# has 'a' and 'b' as normal deps, but 'c' as an 'order-only' dependency
+
 # default target.
 # it has no recipe of its own.
 # it just lists the targets to make 'by default'.
