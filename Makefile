@@ -91,10 +91,10 @@
 #    * compile the c file <in> to the command <out>
 #    * ignore warnings
 #
-# - "diff -u <lhs> <rhs>"
+# - "diff --color=auto -u <lhs> <rhs>"
 #    * compare the files <lhs> and <rhs>
 #    * do nothing if they are equal
-#    * otherwise, fail and print a unified diff
+#    * otherwise, fail and print a unified diff, with color
 #
 # - "touch <arg>"
 #    * let F be 'the file named <arg>'
@@ -170,7 +170,7 @@ o/hw3: o/c4.elf c4.c hw.c | o
 
 # check all hw outputs match
 o/diff_hw_0_%: o/hw0 o/hw% | o
-	diff -u $^
+	diff --color=auto -u $^
 	touch $@
 o/diff_hw: \
 	o/diff_hw_0_1 \
