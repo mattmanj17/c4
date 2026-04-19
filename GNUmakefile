@@ -211,6 +211,11 @@ o/hw3: o/c4.elf c4.c c4.c hw.c | o
 	$+ > $@
 
 # check all hw outputs match
+#
+# note that 'diff' does not output a file,
+# so we use 'touch $@' to produce a placeholder file,
+# just to keep track of the time stamp of the last successful run.
+#
 o/diff_hw_0_%: o/hw0 o/hw% | o
 	diff --color=auto -u $+
 	touch $@
