@@ -1,25 +1,50 @@
 
-# lines starting with the character '#' are 'comments'.
+# lines starting with the character '#' are comments.
 # they are just there to read.
-# they are treated as blank lines.
+# they are ignored, as if they were blank lines.
 
-# a simple 'makefile' is a list of 'targets'.
-#     a 'target' looks like:
-#         name : deps
-#             recipe
-#     where:
-#         - 'name' is the name of the target.
-#         - 'deps' is a list of dependencies.
-#         - 'recipe' is a script used to make the target.
-#           NOTE that each line of the script must start
-#           with a literal tab ('\t') character.
+# the shell
 #
-# when 'make' is invoked with no arguments,
-# it opens this file and makes the first target.
+# the shell is an (often interactive) program that runs commands.
+#
+# it reads a line of text, interprets it as a command, and runs it.
+#
+# for example, in a shell:
+#     echo hello
+# would print:
+#     hello
+#
+# make invokes the shell to run commands specified in a makefile.
+
+# a simple makefile is a list of targets.
+#     a target looks like:
+#         <name> : <deps>
+#             <recipe>
+#     where:
+#         - <name> is the name of the target.
+#
+#         - <deps> is a list of dependencies.
+#
+#         - <recipe> is a list of shell commands used to make the target.
+#            - NOTE that each line of the recipe must start
+#              with a literal tab ('\t') character.
+#            - ALSO NOTE that each recipe line is
+#              usually run in a separate shell.
+#
+# when make is invoked with no arguments,
+# it tries to make the first target in the
+# default makefile in the current directory.
+#
+# with GNU make, the default makefile names are:
+#   1. GNUmakefile
+#   2. makefile
+#   3. Makefile
+# searched for in that order.
 #
 # to make a target named T:
 #
-#   1. make each target named by some dependency
+#   1. for each dependency D,
+#      if D names a target, make that target
 #
 #   2. decide if T is out of date.
 #      T is considered out of date in the following cases:
@@ -30,74 +55,122 @@
 #        (see .PHONY at the bottom of this file)
 #
 #      - there is a dependency D such that
-#        the file T is older than a file named D
+#        the file named D exists,
+#        and the file T is older than the file D
 #
-#      - there is a dependency D listed as a phony target
+#      - a dependency D is listed as a phony target
 #
 #   3. if T is out of date,
 #      run its recipe.
 #
 # you can do 'make <target>' to make a specific target.
 
-# recipe/script lines:
+# running recipe lines:
 #
-# the following is a useful oversimplification of how 'recipes' work.
+# each line of a recipe is passed to the shell.
 #
-# each line of a recipe/script is split into 'words'.
-# that is, each chunk of text not containing 'whitespace' is its own 'word'.
-# the first word is a 'command' to execute,
-# and the remaining words are 'arguments' passed to that command.
+# the shell splits the line into words.
 #
-# for example, the command 'cat' (short for 'conCATenate'):
-# cat takes each argument passed to it, and tries
-# to print the contents of the file named by each argument, in order.
+# roughly speaking:
+#   - each stretch of non-whitespace becomes a word
+#   - the first word names the command to run
+#   - the remaining words are arguments passed to that command
 #
-# thus, "cat hw.c" would print:
+# this is only a rough model:
+# quotes and backslashes can change how a line is split into words.
 #
-# -#include <stdio.h>
-# -
-# -int main()
-# -{
-# -  printf("hello, world\n");
-# -  return 0;
-# -}
+# for example, the command 'cat' (short for 'concatenate')
+# takes file names as arguments, and tries to print each file in order.
 #
-# and "cat hw.c hw.c" would print:
+# if there was a file named 'lines.txt' with the content
 #
-# -#include <stdio.h>
-# -
-# -int main()
-# -{
-# -  printf("hello, world\n");
-# -  return 0;
-# -}
-# -#include <stdio.h>
-# -
-# -int main()
-# -{
-# -  printf("hello, world\n");
-# -  return 0;
-# -}
+# - line 1
+# - line 2
 #
-# 'running a script' means to run each of its lines in order.
+# 'cat lines.txt' would print
+#
+# - line 1
+# - line 2
+#
+# and 'cat lines.txt lines.txt' would print
+#
+# - line 1
+# - line 2
+# - line 1
+# - line 2
+#
+# running a recipe usually means running each of its lines in order.
 
-# commands we depend on
+# quoting
+#
+# in real shell syntax, spaces do not always split words.
+#
+# quotes let us put spaces (and other special characters) inside one word.
+#
+# two common kinds of quotes:
+#
+# - single quotes:   '...'
+# - double quotes:   "..."
+#
+# both stop the shell from splitting a word at spaces.
+#
+# so:
+#
+#   echo hello world
+#
+# is three words:
+#
+# - echo
+# - hello
+# - world
+#
+# but:
+#
+#   echo "hello world"
+#
+# is two words:
+#
+# - echo
+# - hello world
+#
+# inside '...', almost everything is treated literally.
+# the only special character is the closing single quote,
+# which ends the quoted text.
+#
+# for example:
+#
+#   echo '$HOME $HOME'
+#
+# prints:
+#
+# - $HOME $HOME
+#
+# inside "...", some characters still have special meaning.
+#
+# for example:
+#
+#   echo "$HOME $HOME"
+#
+# prints the value of the HOME variable twice,
+# separated by a space.
+
+# commands we depend on:
 #
 # - "mkdir -p <arg>"
-#    * create directory <arg>
+#    * create the directory <arg>
 #    * create missing parent directories as well
 #
 # - "gcc -w -o <out> <in>"
-#    * compile the c file <in> to the command <out>
+#    * build the command <out> from the c file <in>
 #    * ignore warnings
 #
 # - "diff --color=always -u <lhs> <rhs>"
 #    * compare the files <lhs> and <rhs>
-#    * do nothing if they are equal
+#    * print nothing and succeed if they are equal
 #    * otherwise, fail and print a unified diff, with color
 #
 # - "touch <arg>"
-#    * let F be 'the file named <arg>'
+#    * let F be the file named <arg>
 #    * if F does not exist, create it as an empty file
 #    * set F's last-modified time to now
 #
@@ -105,20 +178,33 @@
 #    * print each argument followed by a line break
 #
 # - "chmod +x <arg>"
-#    * allows <arg> to be run directly
+#    * mark <arg> as executable
 #    * used for shell scripts, so you can just do
 #      "./foo.sh" instead of "sh ./foo.sh"
 #
-# - '<lhs> | <rhs>'
-#    * a 'pipe'
-#    * run <lhs> and <rhs>
+# - "<lhs> | <rhs>"
+#    * a pipe
+#    * run <lhs> and <rhs> as a pipeline
 #    * connect standard output of <lhs> to standard input of <rhs>
 #    * this lets <rhs> read the text produced by <lhs>
 #
-# - 'awk <script>'
+# - "<lhs> > <rhs>"
+#    * output redirection
+#    * run <lhs>
+#    * send its standard output to the file <rhs>
+#      instead of to the terminal
+#    * if <rhs> already exists, overwrite it
+#
+# - "<lhs> < <rhs>"
+#    * input redirection
+#    * run <lhs>
+#    * give it the contents of the file <rhs> as standard input
+#      instead of reading from the terminal
+#
+# - "awk <script>"
 #    * read lines from standard input, one at a time
-#    * for each input line, run the awk script <script>
-#    * please document scripts inline
+#    * use the awk script <script> to decide what to do for each line
+#    * please document awk scripts inline
 #
 # - "rm -rf <arg>"
 #    * remove the file or directory <arg>
@@ -126,87 +212,91 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
-# wildcards
-#
-# in the name/deps of a target, the character '%' has a special meaning.
-# essentialy, you are allowed to have at most one % in the target name,
-# and if you do, the names of dependencies may have % in them as well.
-#
-# the % in the target name matches arbitrary text, and that text is pasted
-# into the dep names.
-#
-# for example, if you had a target
-#
-#    T_% : D_%
-#        foo D_% > T_%
-#
-# any time you reference a target of the form 'T_*',
-# it is as if you had a target named that, with % replaced with *.
-#
-# that is, if you referenced T_0 and T_1, it would be as if you had the rules
-#
-#    T_0 : D_0
-#        foo D_0 > T_0
-#
-#    T_1 : D_1
-#        foo D_1 > T_1
-
 # order-only dependencies
 #
-# when you want to depend on merely the existence of a file, and not
-# its time stamp, you list it after a '|' character in the dependencies
+# sometimes, you want to make sure a dependency is made first,
+# but you do not want its timestamp alone to make the target out of date.
 #
-# that is, this target
+# to do that, you list it after a '|' character in the dependency list.
+#
+# for example, this target:
 #
 #    T : a b | c
 #        foo a b c > T
 #
-# has 'a' and 'b' as normal deps, but 'c' as an 'order-only' dependency
+# has 'a' and 'b' as normal dependencies,
+# but 'c' as an order-only dependency
+#
+# so, make must make 'c' before making 'T', if needed,
+# but a newer timestamp on 'c' does not by itself force 'T' to rebuild.
 
-# 'automatic variables'
+# automatic variables
 #
-# there are some special bits of syntax used to reference target/dep
-# names indirectly. the ones we use are:
+# there are some special bits of syntax used to refer to target
+# and dependency names indirectly. the ones used here are:
 #
-#    - $@ : The file name of the target of the rule.
+#    - $@ : the file name of the target of the rule
 #
-#    - $< : The name of the first dependency.
+#    - $< : the file name of the first dependency
 #
-#    - $+ : The names of all the dependencies, with spaces between them.
-#           (does not include order-only dependencies)
+#    - $+ : the file names of all the dependencies,
+#           separated by spaces, preserving duplicates
+#           order-only dependencies are not included
 
-# 'output redirection' with '>'
+# pattern rules
 #
-# if you have a command that prints something,
-# but you want to have that output to a file instead of just
-# writing to the terminal, you can use '>' to redirect the output to a file
+# in a target or dependency name,
+# the character '%' can have a special meaning.
 #
-# that is:
-#
-#    if "cat a b" printed "a\nb\b" to the terminal,
-#    you could instead do "cat a b > c" to save that
-#    output to a file named 'c', instead.
-
-# line continuations
-#
-# the 'name : deps' part of a target definition (and each script line),
-# must all be on one line (that is, contain no line breaks).
-# this is a bit of a pain when you would end up with a very long line,
-# so, there a feature where you can put a '\' at the end of a line to
-# 'ignore' the line break. '\' must be the very last character on the line
-# (no trailing whitespace).
+# the % in the target name matches some arbitrary text,
+# and that same text is substituted into the dependency names.
 #
 # for example:
 #
-#    T : a\
-#        b\
-#        c
-#        d
+#    T_% : D_%
+#        foo $< > $@
 #
-# ends up the same as
+# says how to make targets of the form 'T_<text>'
+# from matching dependencies of the form 'D_<text>'.
+#
+# so, if make wants to build 'T_0',
+# it treats '%' as matching '0'.
+# this behaves like:
+#
+#    T_0 : D_0
+#        foo D_0 > T_0
+#
+# and if make wants to build 'T_1',
+# it treats '%' as matching '1'.
+# this behaves like:
+#
+#    T_1 : D_1
+#        foo D_1 > T_1
+
+# line continuations
+#
+# sometimes, a target definition or recipe line would be too long
+# to write comfortably on one physical line.
+#
+# in that case, you can end a line with '\' to continue it
+# onto the next line.
+#
+# the '\' and the following line break are treated as if they were not there.
+# so, this lets one logical line be written across multiple physical lines.
+#
+# IMPORTANT:
+# the '\' must be the last character on the line.
+# trailing whitespace after '\' can break this.
+#
+# for example:
+#
+#    T : a \
+#        b \
+#        c
+#
+# is treated the same as:
 #
 #    T : a b c
-#        d
 
 # default target.
 # it has no recipe of its own.
