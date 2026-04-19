@@ -57,36 +57,6 @@
 #    * do not prompt for confirmation
 #    * ignore nonexistent files and directories
 
-# pattern rules
-#
-# in a target or dependency name,
-# the character '%' can have a special meaning.
-#
-# the % in the target name matches some arbitrary text,
-# and that same text is substituted into the dependency names.
-#
-# for example:
-#
-#    T_% : D_%
-#        foo $< > $@
-#
-# says how to make targets of the form 'T_<text>'
-# from matching dependencies of the form 'D_<text>'.
-#
-# so, if make wants to build 'T_0',
-# it treats '%' as matching '0'.
-# this behaves like:
-#
-#    T_0 : D_0
-#        foo D_0 > T_0
-#
-# and if make wants to build 'T_1',
-# it treats '%' as matching '1'.
-# this behaves like:
-#
-#    T_1 : D_1
-#        foo D_1 > T_1
-
 # line continuations
 #
 # sometimes, a target definition or recipe line would be too long

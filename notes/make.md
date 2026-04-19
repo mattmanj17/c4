@@ -68,3 +68,17 @@
     - separated by spaces
     - preserves duplicates
     - order-only dependencies not included
+
+### pattern rules
+
+- `%` is a special character in a target name
+    ```
+    # example pattern rule
+    T_% : D_%
+        foo $< > $@
+    ```
+- with that example, `make T_abc` would treat it as
+    ```
+    T_abc : D_abc
+        foo D_abc > T_abc
+    ```
