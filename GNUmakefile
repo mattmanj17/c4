@@ -165,8 +165,8 @@ all: o/diff_hw
 # output directory
 #
 # this makefile puts all generated files in 'o/'.
-# targets that right to this directory need to run
-# after we create it, so that have an order-only dependency on it ("| o").
+# targets that write to this directory need to run _after_ we create it,
+# so they have an order-only dependency on it ("| o").
 #
 # run 'make clean' to remove 'o/'.
 #
