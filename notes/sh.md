@@ -36,8 +36,8 @@
 ### variables
 
 - a variable is a named bit of text
-- you retrieve the value of a variable using `$`
-- for example, `x=hello` `echo $x` would print `hello` 
+- you retrieve the value of a variable using `${...}`
+- for example, `x=hello` `echo ${x}` would print `hello`
 
 ### quoting
 
@@ -53,8 +53,8 @@
 
     - the only special character is `'`, which ends the quote
 
-    - so, `x=hello` `echo '$x'` would print `$x`,  
-      even though it would normaly expand to `hello`
+    - so, `x=hello` `echo '${x}'` would print `${x}`
+        - even though it would normaly expand to `hello`
 
     - to put a `'` in a `'...'`, you do `'...'\''...'`
         - that is, to single quote `a 'b' c`,  
@@ -72,7 +72,7 @@
     - `'` is no longer a special character
         - `"'"` just means `'`
     - variables are expanded 
-        - `x=hello` `echo "$x"` prints `hello`
+        - `x=hello` `echo "${x}"` prints `hello`
         
 ### redirection operators
 
@@ -88,4 +88,4 @@
 
 - `command_1 | command_0`
     - `command_1` reads the output of `command_0`,  
-    instead of from the terminal
+    instead of the input from the terminal
