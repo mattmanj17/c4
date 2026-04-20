@@ -130,3 +130,70 @@ by default, in an interactive `sh` session:
 
 - `command_a | command_b`
     - the stdout of `command_a` becomes the stdin of `command_b`
+
+### script arguments
+
+inside of a script, you get access to some special variables:
+
+- `${0}` : the name of the script file
+- `${1}` : the first argument passed to the script
+- `${n}` : the `n`th argument, for n >= 1
+- `${#}` : the count of arguments passed to the script
+
+some example scripts
+
+- ```sh
+  # name.sh
+  echo "my name is ${0}"
+  ```
+  `sh name.sh` would print `my name is name.sh`
+
+- ```sh
+  # dup.sh
+  echo "${1} ${1}"
+  ```
+  `sh dup.sh a` would print `a a`
+
+- ```sh
+  # flip.sh
+  echo "${2} ${1}"
+  ```
+  `sh flip.sh a b` would print `b a`
+
+- ```sh
+  # count.sh
+  echo "${#}"
+  ```
+  `sh count.sh a a a` would print `3`
+
+### exit statuses
+
+when a command (or script run by `sh`) exits,  
+it returns a number representing its _'exit status'_.
+
+the simplest examples are the commands `true` and `false`.
+
+both exit immediately without doing anything.  
+`true` exits with a 'successful' status.  
+`false` exits with an 'unsuccessful' status.
+
+the special variable `${?}` holds the exit status  
+of the most recently executed command.
+
+by convention, the 'successful status' number is `0`.  
+commands use non-zero exit codes to signal arbitrary information,    
+most commonly errors.
+
+- this script
+  ```sh
+  true
+  echo "${?}"
+  ```
+  should print `0`
+
+- this script
+  ```sh
+  false
+  echo "${?}"
+  ```
+  should print `1`
