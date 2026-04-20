@@ -22,7 +22,7 @@ for example, if you were in an interactive `sh` session,
 and you enter `echo hello world` on the keyboard,  
 you would see `hello world` printed to the screen.
 
-### variables
+## variables
 
 a variable is a named bit of text.  
 you set a variable like this: `x=hello`
@@ -36,7 +36,7 @@ echo "${x}"
 ```
 prints `hello`.
 
-### quoting
+## quoting
 
 quotes help decide where words start and end
 
@@ -91,7 +91,7 @@ unlike `'...'`, inside `"..."`:
       ```
       prints `hello`
 
-### standard streams
+## standard streams
 
 commands usually have three standard streams:
 
@@ -110,7 +110,7 @@ by default, in an interactive `sh` session:
 - stdin is what you enter on the keyboard
 - stdout and stderr are printed to the screen
 
-### redirection operators
+## redirection operators
 
 - `command > file`
 
@@ -130,12 +130,12 @@ by default, in an interactive `sh` session:
     - the stdin of `command` comes from `file`,  
       not what you enter on the keyboard
 
-### pipe operator
+## pipe operator
 
 - `command_a | command_b`
     - the stdout of `command_a` becomes the stdin of `command_b`
 
-### script arguments
+## script arguments
 
 inside of a script, you get access to some special variables:
 
@@ -170,7 +170,7 @@ some example scripts
   ```
   `sh count.sh a a a` would print `3`
 
-### exit statuses
+## exit statuses
 
 when a command (or script run by `sh`) exits,  
 it returns a number representing its _'exit status'_.
@@ -182,7 +182,7 @@ both exit immediately without doing anything.
 `false` exits with an 'unsuccessful' status.
 
 the special variable `${?}` holds the exit status  
-of the most recently executed command.
+of the last command executed.
 
 by convention, the 'successful status' number is `0`.  
 commands use non-zero exit codes to signal arbitrary information,    
@@ -202,7 +202,18 @@ most commonly errors.
   ```
   should print `1`
 
-### boolean operators
+## the `exit` command
+
+`exit` ends the current shell script,   
+or ends the current interactive `sh` session,
+
+`exit` can take one argument:  
+a number to use as the script's (or session's) exit status.
+
+if the argument is omitted,  
+the exit status is that of the last command executed.
+
+## boolean operators
 
 two new `sh` operators
 
@@ -240,3 +251,51 @@ two new `sh` operators
 > in `sh`, it is reversed.  
 > the convention of '`0` means successful exit' is old and strong.  
 > so, we have to deal with a bit of confusion.
+
+## `;`
+
+in `sh`, `;` is a _command separator_.  
+it lets you put multiple commands on one line.
+
+for example, these two scripts have the same behavior:
+- ```sh
+  echo hello; echo world
+  ```
+- ```sh
+  echo hello
+  echo world
+  ```
+
+## the `test` command
+
+a helpful command in `sh` is `test`.
+
+`test` checks whether some condition holds.
+
+`test` is a bit unusual, because you can write it in two ways:
+
+- `test args ...`
+
+- `[ args ... ]`
+
+`[` is really just another form of `test`.  
+the only difference is that it expects its  
+last argument to be `]`.
+
+these two commands mean the same thing:
+- `test "${1}" = hello`
+- `[ "${1}" = hello ]`
+
+some examples:
+
+- `[ "${1}" = hello ]`
+    - true if `${1}` is the text `hello`
+- `[ "${#}" -eq 3 ]`
+    - true if exactly 3 arguments were passed
+- `[ "${#}" -ne 0 ]`
+    - true if any arguments were passed
+
+like other commands,  
+test reports its result using exit status
+- `0` means the test passed
+- non-zero means the test failed
