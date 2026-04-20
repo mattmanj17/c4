@@ -299,3 +299,104 @@ like other commands,
 test reports its result using exit status
 - `0` means the test passed
 - non-zero means the test failed
+
+## `if`
+
+one important control-flow construct in `sh` is `if`.
+
+the syntax of `if` is:
+
+```sh
+# leading `if` block
+if ...; then
+
+    # block
+    ...
+
+# zero or more `elif` blocks
+elif ...; then
+
+    # block
+    ...
+
+# ...
+elif ...; then
+
+    # block
+    ...
+
+# ...
+
+# zero or one `else` block
+else
+
+    # block
+    ...
+
+# trailing `fi` to close the `if`
+fi
+```
+
+or, more succinctly:
+
+```sh
+if ...; then
+    ...
+elif ...; then
+    ...
+elif ...; then
+    ...
+else
+    ...
+fi
+```
+
+---
+
+each `...` is a _list_ of _command invocations_.
+
+an individual invocation is basically of the form:
+- `cmd arg arg ...`
+- optionally followed by `< file` or `> file`.
+
+a _list_ of such invocations consists of individual invocations,  
+possibly connected by operators like:
+
+- `|`
+- `&&`
+- `||`
+- `;`
+
+and possibly split across multiple lines.
+
+---
+
+the semantics of `if` are:
+
+- the `if` list is executed.
+
+- if its exit status is zero,  
+  the first `then` list is executed.
+
+- otherwise,  
+  each `elif` list is executed in turn.
+    - if its exit status is zero,  
+      the corresponding `then` list is executed,  
+      and the `if` command completes.
+
+- otherwise,  
+  the `else` list is executed,  
+  if present.
+
+---
+
+the exit status of the entire construct is:
+
+- `0`, if:
+    - no condition tested true 
+    - AND
+    - there was no `else` block
+
+- otherwise:
+    - the exit status of  
+      the last command executed
