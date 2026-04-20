@@ -1,18 +1,19 @@
 
-# default target
-# it has no recipe of its own
-# it just lists the targets to make by default
-#
-all: o/diff_hw.ok
+# see the following for help!
+# notes/sh.md
+# notes/make.md
+# notes/line_continuations.md
 
-# create output directory
-# --parents : no error if existing, make parent directories as needed
+.PHONY: all clean
+all: \
+	o/diff_hw.ok \
+	o/diff_c4_s_0_1.ok
+
+clean:
+	rm --recursive --force o
+
 o:
 	mkdir --parents o
-
-# compile executables
-# --no-warnings : inhibit all warnings
-# --output=<file> : place output into <file>
 o/%.elf: %.c | o
 	gcc --no-warnings --output=$@ $<
 
@@ -36,21 +37,9 @@ o/diff_hw.ok: \
 	touch $@
 
 # c4 -s should be deterministic
-# :( currently fails...
 o/c4_s_0.txt: o/c4.elf c4.c | o
 	o/c4.elf -s c4.c > $@
 o/c4_s_1.txt: o/c4.elf c4.c | o
 	o/c4.elf -s c4.c > $@
 o/diff_c4_s_0_1.ok: tools/diff-touch.sh o/c4_s_0.txt o/c4_s_1.txt | o
 	$+ $@
-
-# remove o/
-# --recursive : remove directories and their contents recursively
-# --force : ignore nonexistent files and arguments, never prompt
-clean:
-	rm --recursive --force o
-
-# targets always considered out of date.
-# .PHONY has no recipe of its own.
-# it is just magic for listing phony targets.
-.PHONY: all clean
