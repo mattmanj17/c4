@@ -421,3 +421,84 @@ the exit status of the entire construct is:
 - otherwise:
     - the exit status of  
       the last command executed
+
+## functions
+
+a function is a named block of shell code.
+
+once a function is defined,
+you can run it by writing its name as a command.
+
+the syntax is:
+
+```sh
+name() {
+    ...
+}
+```
+
+`name` is the function name,  
+and `...` is a list of shell commands.
+
+for example
+
+```sh
+say_hello() {
+    echo hello
+}
+
+say_hello
+say_hello
+```
+
+prints
+
+```
+hello
+hello
+```
+
+## how to get help
+
+first of all, if you use some core `sh` feature that is not documented here,  
+consider adding a section on it (or expanding an existing one).
+
+if you are reading a script and want to know what a given command does,  
+here are decent 'troubleshooting' steps to figure it out.
+
+suppose `huh` is a command we want to know more about.
+
+- try `man 1 huh`
+    - if `huh` is an installed command with a manual,  
+      this should bring it up
+
+- try `help huh`
+    - if `huh` is a _built-in_ command of your shell,  
+      this should print its help info.
+
+- try `huh --help`, `huh -h`, or `huh help`
+    - some commands provide a built-in help option
+
+that should be enough to make you dangerous `:)`
+
+if all else fails, you can browse the manual for `sh` itself.  
+you can try `man 1 sh`, but if you want more confidence you are reading  
+the right man page, try the following:
+
+do `echo "${0}"`. this should print the name/path of  
+the current `sh` you are in.
+
+if you are in a _login shell_, it might start with a leading `-`.
+
+it might also be a longer path.
+
+in any case, what you want is the last bit after any `/` or `-`.  
+if that is `somesh`, try `man 1 somesh`
+
+if you want a one liner, this has worked in the past
+
+`man 1 -- "$(basename -- "$0" | sed 's/^-//')"`
+
+> `--` is magic to prevent commands from choking  
+> on arguments starting with `-` ...  
+> maybe we should add a section about that!  

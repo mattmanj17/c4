@@ -74,8 +74,10 @@ else
 	# update timestamp if files are the same.
 	# otherwise show a red message.
 	if [ "${status}" -eq 0 ]; then
+		# touch it!
 		touch "${3}"
 	else
+		# see https://en.wikipedia.org/wiki/ANSI_escape_code
 		printf '\033[31m"%s" and "%s" differ!\033[0m\n' "${1}" "${2}" >&2
 	fi
 fi
