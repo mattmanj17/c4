@@ -197,3 +197,42 @@ most commonly errors.
   echo "${?}"
   ```
   should print `1`
+
+### boolean operators
+
+two new `sh` operators
+
+- `command_0 && command_1`
+
+- `command_0 || command_1`
+
+`&&` is pronounced _'and'_.  
+`||` is pronounced _'or'_.
+
+> `&&` and `||` chain commands based on   
+>  whether the command on the left succeeded
+
+`&&` means "only run the right command if the left one succeeds".  
+`||` means "only run the right command if the left one fails".
+
+> if we use the commands `true` and `false` as examples,  
+> we see that `&&` and `||` follow the usual patterns of a  
+> [_'boolean algebra'_](https://simple.wikipedia.org/wiki/Boolean_algebra)
+
+- `&&`
+    - `false && false` behaves like `false`
+    - `false && true` behaves like `false`
+    - `true && false` behaves like `false`
+    - `true && true` behaves like `true`
+
+- `||`
+    - `false || false` behaves like `false`
+    - `false || true` behaves like `true`
+    - `true || false` behaves like `true`
+    - `true || true` behaves like `true`
+
+> in normal boolean algebra,   
+> `1` means `true` and `0` means `false`.  
+> in `sh`, it is reversed.  
+> the convention of '`0` means successful exit' is old and strong.  
+> so, we have to deal with a bit of confusion.
