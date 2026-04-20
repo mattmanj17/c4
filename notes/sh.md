@@ -122,6 +122,10 @@ by default, in an interactive `sh` session:
     - `echo hello > hello.txt` creates `hello.txt` containing `hello`,  
       followed by a line break
 
+- `command >&2`
+
+    - write the stdout of `command` to stderr
+
 - `command < file`
     - the stdin of `command` comes from `file`,  
       not what you enter on the keyboard
