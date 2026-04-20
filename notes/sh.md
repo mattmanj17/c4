@@ -36,6 +36,26 @@ echo "${x}"
 ```
 prints `hello`.
 
+## command substitution
+
+Command substitution allows the _output_ of a command  
+to replace _the command itself_.
+
+the syntax is:
+- `"$(command)"`
+
+these two scripts have the same behavior
+
+```sh
+x=hello
+echo "${x}"
+```
+
+```sh
+x="$(echo hello)"
+echo "${x}"
+```
+
 ## quoting
 
 quotes help decide where words start and end
@@ -90,6 +110,7 @@ unlike `'...'`, inside `"..."`:
       echo "${x}"
       ```
       prints `hello`
+- command substitution occurs
 
 ## standard streams
 

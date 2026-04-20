@@ -1,0 +1,75 @@
+[1mdiff --git a/notes/sh.md b/notes/sh.md[m
+[1mindex ca9521e..d97b5ee 100644[m
+[1m--- a/notes/sh.md[m
+[1m+++ b/notes/sh.md[m
+[36m@@ -36,6 +36,27 @@[m [mecho "${x}"[m
+ ```[m
+ prints `hello`.[m
+ [m
+[32m+[m[32m## command substitution[m
+[32m+[m
+[32m+[m[32mCommand substitution allows the _output_ of a command[m[41m  [m
+[32m+[m[32mto replace _the command itself_.[m
+[32m+[m
+[32m+[m[32mthe syntax is:[m
+[32m+[m[32m- `"$(command)"`[m
+[32m+[m
+[32m+[m[32mthese two scripts have the same behavior[m
+[32m+[m
+[32m+[m[32m```sh[m
+[32m+[m[32mx=hello[m
+[32m+[m[32mecho "${x}"[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32m```sh[m
+[32m+[m[32mx="$(echo hello)"[m
+[32m+[m[32mecho "${x}"[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m
+ ## quoting[m
+ [m
+ quotes help decide where words start and end[m
+[36m@@ -90,6 +111,7 @@[m [munlike `'...'`, inside `"..."`:[m
+       echo "${x}"[m
+       ```[m
+       prints `hello`[m
+[32m+[m[32m- command substitution occurs[m
+ [m
+ ## standard streams[m
+ [m
+[36m@@ -399,4 +421,4 @@[m [mthe exit status of the entire construct is:[m
+ [m
+ - otherwise:[m
+     - the exit status of  [m
+[31m-      the last command executed[m
+[32m+[m[32m      the last command executed[m
+\ No newline at end of file[m
+[1mdiff --git a/tools/diff-touch.sh b/tools/diff-touch.sh[m
+[1mindex 8a33f08..e5fa045 100644[m
+[1m--- a/tools/diff-touch.sh[m
+[1m+++ b/tools/diff-touch.sh[m
+[36m@@ -1,4 +1,5 @@[m
+ #!/bin/sh[m
+[32m+[m[32m# see notes/sh.md for help![m
+ [m
+ # exit on first failed command.[m
+ set -e[m
+[36m@@ -26,7 +27,7 @@[m [mfi[m
+ #[m
+ # ${tmp} holds the file name.[m
+ #[m
+[31m-tmp=$(mktemp)[m
+[32m+[m[32mtmp="$(mktemp)"[m
+ [m
+ # remove ${tmp} on exit.[m
+ trap 'rm --force "${tmp}"' EXIT[m
+[36m@@ -41,7 +42,7 @@[m [mtrap 'rm --force "${tmp}"' EXIT[m
+ if diff --color=always --unified "${1}" "${2}" > "${tmp}"; then[m
+ 	status=0[m
+ else[m
+[31m-	status=$?[m
+[32m+[m	[32mstatus=${?}[m
+ fi[m
+ [m
+ # report error, or print diff[m

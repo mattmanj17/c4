@@ -1,4 +1,5 @@
 #!/bin/sh
+# see notes/sh.md for help!
 
 # exit on first failed command.
 set -e
@@ -26,7 +27,7 @@ fi
 #
 # ${tmp} holds the file name.
 #
-tmp=$(mktemp)
+tmp="$(mktemp)"
 
 # remove ${tmp} on exit.
 trap 'rm --force "${tmp}"' EXIT
@@ -41,7 +42,7 @@ trap 'rm --force "${tmp}"' EXIT
 if diff --color=always --unified "${1}" "${2}" > "${tmp}"; then
 	status=0
 else
-	status=$?
+	status=${?}
 fi
 
 # report error, or print diff
