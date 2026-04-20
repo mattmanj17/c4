@@ -1,91 +1,132 @@
 
 # sh
 
-- `sh` is a program that runs commands
+`sh` is a program that runs _'commands'_
 
-    - it can be used interactivly
-    - or it can run a script: `sh <script>`
+- it can be used interactively
+- or it can run scripts: `sh ./script.sh`
 
-- lines starting with `#` are comments
+usually, a line starting with `#` is a comment
 
-    - just there for you to read
-    - ignored as if they were blank lines
+- just there for you to read
+- ignored as if they were blank lines
 
-- each non-blank line passed to `sh` _'calls a command'_
+for each non-blank line of input:
 
-    - the line is broken up into _'words'_
-        
-        - some kinds of words:
-            - __quotes__
-            - consecutive non-whitespace characters
-        - for example `echo hello world` is 3 words
-            - `echo`
-            - `hello`
-            - `world`
-        - while `echo "hello world"` is two words
-            - `echo`
-            - `hello world`
+- `sh` splits the line into _'words'_
 
-    - the first word names a command to run, and the  
-      remaining words are passed to that command as arguments 
+- the first word names a command to run, and the  
+  remaining words are passed to that command as arguments
 
-    - for example, if you were in an iteractive `sh` session,  
-      and you typed `echo "hello world"`, you would see `hello world`  
-      'echo-ed' back to you (written on the screen)
+for example, if you were in an interactive `sh` session,  
+and you enter `echo hello world` on the keyboard,  
+you would see `hello world` printed to the screen.
 
 ### variables
 
-- a variable is a named bit of text
-- you retrieve the value of a variable using `${...}`
-- for example, `x=hello` `echo ${x}` would print `hello`
+a variable is a named bit of text.  
+you set a variable like this: `x=hello`
+
+you retrieve the value of a variable like this: `${x}`
+
+for example, the script:
+```sh
+x=hello
+echo "${x}"
+```
+prints `hello`.
 
 ### quoting
 
-- quotes let us put spaces (_and other special characters_) inside words
+quotes help decide where words start and end
 
-- some kinds of quotes:
-    - single quotes: `'...'`
-    - double quotes: `"..."`
+- for example `echo hello world` is 3 words:
+    - `echo`
+    - `hello`
+    - `world`
 
-- both `'...'` and `"..."` prevent spaces from splitting words
+- while `echo "hello world"` is 2 words:
+    - `echo`
+    - `hello world`
 
-- inside `'...'`, almost everything is treated literally
+two common kinds of quotes:
 
-    - the only special character is `'`, which ends the quote
+- single quotes: `'...'`
+- double quotes: `"..."`
 
-    - so, `x=hello` `echo '${x}'` would print `${x}`
-        - even though it would normaly expand to `hello`
+> both `'...'` and `"..."` prevent spaces from splitting words
 
-    - to put a `'` in a `'...'`, you do `'...'\''...'`
-        - that is, to single quote `a 'b' c`,  
-          you would write `'a '\''b'\'' c'`
-        > there are two ways to think about this
-        > 
-        > one, putting `'\''` inside `'...'` is  
-        > "just how you put a `'` in a `'...'`"
-        >
-        > or, using `a 'b' c` as an example again,  
-        > the 5 bits `'a '`, `\'`, `'b'`, `\'`, `' c'`  
-        > get joined back together to form `a 'b' c`
+inside `'...'`, almost everything is treated literally
 
-- unlike `'...'`, inside of `"..."` :
-    - `'` is no longer a special character
-        - `"'"` just means `'`
-    - variables are expanded 
-        - `x=hello` `echo "${x}"` prints `hello`
-        
+- the only special character is `'`, which ends the quote
+
+- the script:
+  ```sh
+  x=hello
+  echo '${x}'
+  ```
+  would print `${x}`, even though `${x}`  
+  normally expands to the value of `x`
+
+- to put a `'` in a `'...'`, you do `'...'\''...'`
+    - that is, to single quote `a 'b' c`,  
+      you would write `'a '\''b'\'' c'`
+    > there are two ways to think about this
+    >
+    > one, putting `'\''` inside `'...'` is  
+    > "just how you put a `'` in a `'...'`"
+    >
+    > or, using `a 'b' c` as an example again,  
+    > the 5 bits `'a '`, `\'`, `'b'`, `\'`, `' c'`  
+    > get joined back together to form `a 'b' c`
+
+unlike `'...'`, inside `"..."`:
+- `'` is no longer a special character
+    - `"'"` just means `'`
+- variables are expanded
+    - the script
+      ```sh
+      x=hello
+      echo "${x}"
+      ```
+      prints `hello`
+
+### standard streams
+
+commands usually have three standard streams:
+
+- standard input, to read generic input data
+- standard output, to write normal output
+- standard error, to write error messages
+
+more commonly called:
+
+- stdin
+- stdout
+- stderr
+
+by default, in an interactive `sh` session:
+
+- stdin is what you enter on the keyboard
+- stdout and stderr are printed to the screen
+
 ### redirection operators
 
 - `command > file`
-    - redirect the output of `command` to the file `file`
+
+    - the stdout of `command` is written to `file`,  
+      not printed to the screen
+
     - if `file` already exists, overwrite it
-    - `echo hello > hello.txt` creates `hello.txt` containing `"hello\n"`
+
+    - `echo hello > hello.txt` creates `hello.txt` containing `hello`,  
+      followed by a line break
 
 - `command < file`
-    - `command` reads from `file` instead of the terminal
+    - the stdin of `command` comes from `file`,  
+      not what you enter on the keyboard
 
 ### pipe operator
 
-- `command_1 | command_0`
-    - `command_1` reads the output of `command_0`,  
-    instead of the input from the terminal
+- `command_a | command_b`
+    - the stdout of `command_a` becomes the stdin of `command_b`

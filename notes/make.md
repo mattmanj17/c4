@@ -1,7 +1,7 @@
 
 # make
 
-- lines starting with `#` are comments
+- usually, lines starting with `#` are comments
     - just there for you to read
     - ignored as if they were blank lines
 
